@@ -13,6 +13,7 @@ namespace Xabbuh\XApi\Serializer\Symfony\Normalizer;
 
 use Xabbuh\XApi\Model\Statement;
 use Xabbuh\XApi\Model\StatementId;
+use Xabbuh\XApi\Serializer\Exception\UnsupportedStatementVersionException;
 
 /**
  * Normalizes and denormalizes xAPI statements.
@@ -34,6 +35,7 @@ final class StatementNormalizer extends Normalizer
             'actor' => $this->normalizeAttribute($object->getActor(), $format, $context),
             'verb' => $this->normalizeAttribute($object->getVerb(), $format, $context),
             'object' => $this->normalizeAttribute($object->getObject(), $format, $context),
+            'version' => $object->getVersion(),
         );
 
         if (null !== $id = $object->getId()) {
@@ -80,6 +82,14 @@ final class StatementNormalizer extends Normalizer
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
+        if (isset($data['version'])) {
+            $version = $data['version'];
+
+            if (!preg_match('/^1\.0(?:\.\d+)?$/', $version)) {
+                throw new UnsupportedStatementVersionException($version);
+            }
+        }
+
         $id = isset($data['id']) ? StatementId::fromString($data['id']) : null;
         $actor = $this->denormalizeData($data['actor'], 'Xabbuh\XApi\Model\Actor', $format, $context);
         $verb = $this->denormalizeData($data['verb'], 'Xabbuh\XApi\Model\Verb', $format, $context);

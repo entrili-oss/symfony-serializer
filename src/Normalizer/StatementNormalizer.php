@@ -11,9 +11,9 @@
 
 namespace Xabbuh\XApi\Serializer\Symfony\Normalizer;
 
+use Xabbuh\XApi\Common\Exception\UnsupportedStatementVersionException;
 use Xabbuh\XApi\Model\Statement;
 use Xabbuh\XApi\Model\StatementId;
-use Xabbuh\XApi\Serializer\Exception\UnsupportedStatementVersionException;
 
 /**
  * Normalizes and denormalizes xAPI statements.
@@ -82,11 +82,13 @@ final class StatementNormalizer extends Normalizer
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
+        $version = null;
+
         if (isset($data['version'])) {
             $version = $data['version'];
 
             if (!preg_match('/^1\.0(?:\.\d+)?$/', $version)) {
-                throw new UnsupportedStatementVersionException($version);
+                throw new UnsupportedStatementVersionException(sprintf('Statements at version "%s" are not supported.', $version));
             }
         }
 
@@ -125,7 +127,7 @@ final class StatementNormalizer extends Normalizer
             $attachments = $this->denormalizeData($data['attachments'], 'Xabbuh\XApi\Model\Attachment[]', $format, $context);
         }
 
-        return new Statement($id, $actor, $verb, $object, $result, $authority, $created, $stored, $statementContext, $attachments);
+        return new Statement($id, $actor, $verb, $object, $result, $authority, $created, $stored, $statementContext, $attachments, $version);
     }
 
     /**

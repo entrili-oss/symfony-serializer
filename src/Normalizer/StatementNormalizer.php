@@ -11,6 +11,7 @@
 
 namespace Xabbuh\XApi\Serializer\Symfony\Normalizer;
 
+use Xabbuh\XApi\Common\Exception\UnsupportedStatementVersionException;
 use Xabbuh\XApi\Model\Statement;
 use Xabbuh\XApi\Model\StatementId;
 
@@ -34,6 +35,7 @@ final class StatementNormalizer extends Normalizer
             'actor' => $this->normalizeAttribute($object->getActor(), $format, $context),
             'verb' => $this->normalizeAttribute($object->getVerb(), $format, $context),
             'object' => $this->normalizeAttribute($object->getObject(), $format, $context),
+            'version' => $object->getVersion(),
         );
 
         if (null !== $id = $object->getId()) {
@@ -80,6 +82,16 @@ final class StatementNormalizer extends Normalizer
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
+        $version = null;
+
+        if (isset($data['version'])) {
+            $version = $data['version'];
+
+            if (!preg_match('/^1\.0(?:\.\d+)?$/', $version)) {
+                throw new UnsupportedStatementVersionException(sprintf('Statements at version "%s" are not supported.', $version));
+            }
+        }
+
         $id = isset($data['id']) ? StatementId::fromString($data['id']) : null;
         $actor = $this->denormalizeData($data['actor'], 'Xabbuh\XApi\Model\Actor', $format, $context);
         $verb = $this->denormalizeData($data['verb'], 'Xabbuh\XApi\Model\Verb', $format, $context);
@@ -115,7 +127,7 @@ final class StatementNormalizer extends Normalizer
             $attachments = $this->denormalizeData($data['attachments'], 'Xabbuh\XApi\Model\Attachment[]', $format, $context);
         }
 
-        return new Statement($id, $actor, $verb, $object, $result, $authority, $created, $stored, $statementContext, $attachments);
+        return new Statement($id, $actor, $verb, $object, $result, $authority, $created, $stored, $statementContext, $attachments, $version);
     }
 
     /**

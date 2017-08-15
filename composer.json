@@ -11,6 +11,28 @@
             "homepage": "https://github.com/xabbuh"
         }
     ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/entrili-oss/serializer"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/entrili-oss/exception"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/entrili-oss/model"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/entrili-oss/json-test-fixtures"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/entrili-oss/test-fixtures"
+        }
+    ],
     "require": {
         "php": ">=5.3.0",
         "entrili-oss/serializer": "~3.0",

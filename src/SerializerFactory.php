@@ -67,4 +67,12 @@ final class SerializerFactory implements SerializerFactoryInterface
     {
         return new ActivitySerializer($this->serializer);
     }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function createPersonSerializer()
+    {
+        return null;
+    }
 }

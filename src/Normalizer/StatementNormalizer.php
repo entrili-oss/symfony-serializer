@@ -80,10 +80,35 @@ final class StatementNormalizer extends Normalizer
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($deserializedData, $class, $format = null, array $context = array())
+    {
+        /**
+         * set of Statements
+         */
+        if (isset($deserializedData[0])) {
+            $statementIds = [];
+            foreach ($deserializedData as $data) {
+                $statementIds[] = $this->denormarlizeStatement($data, $format, $context);
+            }
+            return $statementIds;
+        }
+
+        /**
+         * Once
+         */
+        return $this->denormarlizeStatement($deserializedData, $format, $context);
+    }
+
+    /**
+     * @param array $data
+     * @param null|string $format
+     * @param array $context
+     * @return Statement
+     * @throws UnsupportedStatementVersionException
+     */
+    public function denormarlizeStatement($data, $format = null, array $context = array())
     {
         $version = null;
-
         if (isset($data['version'])) {
             $version = $data['version'];
 
